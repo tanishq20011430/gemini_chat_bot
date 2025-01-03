@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced AI Chatbot Interface</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #10a37f;
+            --secondary-color: #1a1a1a;
+            --background-color: #ffffff;
+            --chat-background: #f7f7f8;
+            --text-color: #333333;
+            --border-color: #e5e5e5;
+            --button-hover: #0d8b6a;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Söhne', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .chat-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--chat-background);
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+
+        .new-chat-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .new-chat-btn:hover {
+            background-color: var(--button-hover);
+        }
+
+        .input-area {
+            padding: 20px;
+            background-color: var(--background-color);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .input-container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px var(--shadow-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-upload-area {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .file-upload-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .file-upload-button:hover {
+            background-color: var(--button-hover);
+        }
+
+        .file-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 32px;
+        }
+
+        .file-item {
+            background-color: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+        }
+
+        .file-remove {
+            cursor: pointer;
+            color: #666;
+            padding: 2px;
+        }
+
+        .file-remove:hover {
+            color: #ff4444;
+        }
+
+        .message-input {
+            width: 100%;
+            padding: 16px;
+            padding-right: 50px;
+            border: none;
+            border-radius: 8px;
+            resize: none;
+            min-height: 24px;
+            max-height: 200px;
+            font-family: inherit;
+            font-size: 16px;
+            line-height: 1.5;
+            outline: none;
+        }
+
+        .input-buttons {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+        }
+
+        .action-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--primary-color);
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .action-button:hover {
+            background-color: rgba(16, 163, 127, 0.1);
+        }
+
+        .action-button:disabled {
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .message {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 1px 3px var(--shadow-color);
+            animation: messageAppear 0.3s ease-out;
+        }
+
+        @keyframes messageAppear {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-message {
+            background-color: white;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .ai-message {
+            background-color: var(--chat-background);
+            border-left: 4px solid #19c37d;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 14px;
+        }
+
+        .user-avatar {
+            background-color: #4a5568;
+        }
+
+        .message-content {
+            font-size: 15px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .message-content img {
+            max-width: 100%;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+
+        .loading {
+            display: inline-flex;
+            gap: 4px;
+            margin-left: 10px;
+        }
+
+        .loading span {
+            width: 6px;
+            height: 6px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            animation: bounce 0.5s infinite alternate;
+        }
+
+        .loading span:nth-child(2) { animation-delay: 0.2s; }
+        .loading span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-4px); }
+        }
+
+        .history-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .history-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .error-message {
+            color: #ff4444;
+            margin-top: 8px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                padding: 10px;
+                max-height: 200px;
+            }
+
+            .chat-area {
+                height: 0;
+                flex-grow: 1;
+            }
+
+            .message {
+                margin: 10px auto;
+                padding: 15px;
+            }
+
+            .input-area {
+                padding: 10px;
+            }
+
+            .file-upload-area {
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .file-upload-button {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .message-input {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .message {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <button class="new-chat-btn" onclick="startNewChat()">
+                <i class="fas fa-plus"></i>
+                New chat
+            </button>
+            <div class="chat-history" id="chatHistory"></div>
+        </div>
+        <div class="chat-area">
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="input-area">
+                <div class="input-container">
+                    <div class="file-upload-area">
+                        <input type="file" id="fileInput" multiple style="display: none" onChange="handleFileSelect(event)">
+                        <button class="file-upload-button" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-paperclip"></i>
+                            Attach files
+                        </button>
+                        <div class="file-list" id="fileList"></div>
+                    </div>
+                    <textarea 
+                        class="message-input" 
+                        id="messageInput" 
+                        placeholder="Message Gemini..." 
+                        rows="1" 
+                        onInput="autoResize(this)"
+                    ></textarea>
+                    <div class="input-buttons">
+                        <button class="action-button" id="sendButton" onclick="sendMessage()" title="Send message">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let chatHistory = [];
+        let currentChatId = Date.now();
+        let uploadedFiles = [];
+        let isProcessing = false;
+
+        // Your Google Gemini API key
+        const GEMINI_API_KEY = 'AIzaSyAFJs71LvQVQMmaGDF2C1_ps88HGDORi9A';
+        const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+        }
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            const fileList = document.getElementById('fileList');
+            
+            for (const file of files) {
+                if (uploadedFiles.some(f => f.name === file.name)) continue;
+                
+                uploadedFiles.push(file);
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <i class="fas fa-file"></i>
+                    <span>${file.name}</span>
+                    <i class="fas fa-times file-remove" onclick="removeFile('${file.name}')"></i>
+                `;
+                fileList.appendChild(fileItem);
+            }
+        }
+
+        function removeFile(fileName) {
+            uploadedFiles = uploadedFiles.filter(file => file.name !== fileName);
+            const fileList = document.getElementById('fileList');
+            const fileItems = fileList.getElementsByClassName('file-item');
+            for (const item of Array.from(fileItems)) {
+                if (item.querySelector('span').textContent === fileName) {
+                    item.remove();
+                    break;
+                }
+            }
+        }
+
+        async function processFiles() {
+            const fileContents = [];
+            for (const file of uploadedFiles) {
+                try {
+                    const content = await readFileContent(file);
+                    fileContents.push({
+                        name: file.name,
+                        content: content,
+                        type: file.type
+                    });
+                } catch (error) {
+                    console.error(`Error processing file ${file.name}:`, error);
+                    throw new Error(`Failed to process file ${file.name}`);
+                }
+            }
+            return fileContents;
+        }
+
+        function readFileContent(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = event => resolve(event.target.result);
+                reader.onerror = error => reject(error);
+                
+                if (file.type.startsWith('image/')) {
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.readAsText(file);
+                }
+            });
+        }
+
+        function startNewChat() {
+            if (isProcessing) return;
+            
+            currentChatId = Date.now();
+            document.getElementById('chatMessages').innerHTML = '';
+            uploadedFiles = [];
+            document.getElementById('fileList').innerHTML = '';
+            document.getElementById('messageInput').value = '';
+            addChatToHistory();
+        }
+
+        function addChatToHistory() {
+            const historyDiv = document.getElementById('chatHistory');
+            const chatItem = document.createElement('div');
+            chatItem.className = 'history-item';
+            chatItem.innerHTML = `
+                <i class="fas fa-message"></i>
+                <span>New Chat ${new Date().toLocaleTimeString()}</span>
+            `;
+            historyDiv.prepend(chatItem);
+        }
+
+        function addMessage(content, isUser = true) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            
+            messageDiv.innerHTML = `
+                <div class="message-header">
+                    <div class="avatar ${isUser ? 'user-avatar' : 'ai-avatar'}
+                    <div class="avatar ${isUser ? 'user-avatar' : 'ai-avatar'}">
+                        <i class="fas ${isUser ? 'fa-user' : 'fa-robot'}"></i>
+                    </div>
+                    <span>${isUser ? 'You' : 'Gemini'}</span>
+                </div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            messagesDiv.appendChild(messageDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const messageContent = document.getElementById('messageInput').value.trim();
+            if ((!messageContent && uploadedFiles.length === 0) || isProcessing) return;
+            
+            isProcessing = true;
+            const sendButton = document.getElementById('sendButton');
+            sendButton.disabled = true;
+            
+            addMessage(messageContent, true);
+            document.getElementById('messageInput').value = '';
+            autoResize(document.getElementById('messageInput'));
+            
+            const messagesDiv = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message ai-message';
+            typingDiv.innerHTML = `
+                <div class="message-header">
+                    <div class="avatar ai-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <span>Gemini</span>
+                    <div class="loading">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            `;
+            messagesDiv.appendChild(typingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            try {
+                const fileContents = await processFiles();
+                const response = await callGeminiAPI(messageContent, fileContents);
+                
+                typingDiv.remove();
+                uploadedFiles = [];
+                document.getElementById('fileList').innerHTML = '';
+
+                if (response.error) {
+                    throw new Error(response.error.message || 'An error occurred while processing your request');
+                }
+
+                const aiMessageDiv = document.createElement('div');
+                aiMessageDiv.className = 'message ai-message';
+                aiMessageDiv.innerHTML = `
+                    <div class="message-header">
+                        <div class="avatar ai-avatar">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <span>Gemini</span>
+                    </div>
+                    <div class="message-content">${formatResponse(response)}</div>
+                `;
+                messagesDiv.appendChild(aiMessageDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            } catch (error) {
+                console.error('Error:', error);
+                typingDiv.innerHTML = `
+                    <div class="message-header">
+                        <div class="avatar ai-avatar">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <span>Error</span>
+                    </div>
+                    <div class="message-content">
+                        Sorry, there was an error processing your request: ${error.message}
+                    </div>
+                `;
+            } finally {
+                isProcessing = false;
+                sendButton.disabled = false;
+            }
+        }
+
+        function formatResponse(response) {
+            // Format code blocks, links, and other markdown-style content
+            let formattedText = response;
+            
+            // Handle code blocks
+            formattedText = formattedText.replace(
+                /```(\w+)?\n([\s\S]*?)```/g,
+                '<pre><code class="language-$1">$2</code></pre>'
+            );
+            
+            // Handle inline code
+            formattedText = formattedText.replace(
+                /`([^`]+)`/g,
+                '<code>$1</code>'
+            );
+            
+            // Handle links
+            formattedText = formattedText.replace(
+                /\[([^\]]+)\]\(([^)]+)\)/g,
+                '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+            );
+            
+            // Handle lists
+            formattedText = formattedText.replace(
+                /^\s*[-*+]\s+(.+)$/gm,
+                '<li>$1</li>'
+            ).replace(
+                /(<li>.*<\/li>)/s,
+                '<ul>$1</ul>'
+            );
+            
+            return formattedText;
+        }
+
+        async function callGeminiAPI(message, files) {
+            try {
+                const parts = [];
+                
+                if (message) {
+                    parts.push({ text: message });
+                }
+
+                for (const file of files) {
+                    if (file.type.startsWith('image/')) {
+                        parts.push({
+                            inlineData: {
+                                mimeType: file.type,
+                                data: file.content.split(',')[1]
+                            }
+                        });
+                    } else {
+                        parts.push({ text: `File ${file.name}:\n${file.content}` });
+                    }
+                }
+
+                const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: parts
+                        }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            topK: 40,
+                            topP: 0.95,
+                            maxOutputTokens: 1024,
+                        },
+                        safetySettings: [
+                            {
+                                category: "HARM_CATEGORY_HARASSMENT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_HATE_SPEECH",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            },
+                            {
+                                category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                                threshold: "BLOCK_MEDIUM_AND_ABOVE"
+                            }
+                        ]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.candidates[0].content.parts[0].text;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw new Error('Failed to communicate with Gemini API');
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('messageInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            startNewChat();
+        });
+    </script>
+</body>
+</html>
